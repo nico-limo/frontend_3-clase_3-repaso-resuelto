@@ -1,32 +1,42 @@
-import React, {useState} from 'react'; // No prestar atencion a esto
+import React, { useState } from 'react'; 
+import axios from 'axios';
 import './App.css';
 import Button from "./components/Button";
+import Listado from './components/Listado';
 
 function App() {
-  const frasesBoton = ["Click si eres valiente", "Prueba otra frase", "Yo controlo el boton"];
-  const [frasesChuck, setFrasesChuck] = useState([]);
+  // Se puede hacer un arreglo para almacenar datos similares
+  const frases = ["Haz Click","Click si eres valiente","Prueba otra frase","Yo controlo el boton"];
 
-  const getRandom = (value, fraseChuck) => {
-    const prevFrase = value;
-    const nextFrase = frasesBoton[parseInt(Math.random() * frasesBoton.length)]   
-    if (prevFrase === nextFrase){ 
-          getRandom(prevFrase, fraseChuck); 
-        } else {
-          if(frasesChuck.length <= 5 )setFrasesChuck([...frasesChuck,fraseChuck]); 
-          return nextFrase;
-        }
-        return nextFrase;
+  const indiceRandom = (arr) => Math.floor(Math.random() * arr.length); // Se puede retornar sin llaves cuando es una linea
+  
+  function fraseRandom(arreglo = [],fraseActual, fraseUno, fraseDos, fraseTres) {
+    let indice = indiceRandom(arreglo);
+    fetchData();
+    return fraseActual === arreglo[indice] ? "Dale Click" : arreglo[indice];
   }
+
+const [fraseChuck, setFraseChuck] = useState("") // Manera de react para crear estados
+  
+async function fetchData() {
+   const resultado = await axios.get('https://api.chucknorris.io/jokes/random')
+   setFraseChuck(resultado.data.value) // Mandera de react para actualizar estados
+ };
+
 
   return (
     <div className="app">
-      <Button onClick={getRandom} />
-      <div className="app__viejasFrases">
-        <h3>ULTIMAS 5 FRASES</h3>
-        {frasesChuck.map((frase, index) => <p key={index}>{frase}</p>)} 
-      </div>
+      <Button 
+      defaultFrase={frases[0]}
+      arregloDeFrases={frases}
+      onClick={fraseRandom}
+      fraseChuck={fraseChuck}
+      />
+      <Listado listadoDeFrases={fraseChuck} />
     </div>
-  );
+
+  )
+
 }
 
 export default App;
